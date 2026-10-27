@@ -20,8 +20,15 @@ app.use(helmet());
 app.use(
   cors({
     origin(origin, callback) {
-      // Allow non-browser clients (such as curl) with no Origin header.
-      if (!origin || clientOrigins.includes(origin)) return callback(null, true);
+      const allowedOrigins = [
+        ...clientOrigins,
+        "https://venue-vista-ashen.vercel.app"
+      ];
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
       return callback(new Error("Origin is not allowed by CORS."));
     },
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
@@ -29,7 +36,6 @@ app.use(
     credentials: true
   })
 );
-
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: false, limit: "20kb" }));
 
