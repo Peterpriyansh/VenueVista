@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+coverage/
+.DS_Store
+npm-debug.log*
+test-db.js
+*.bak
+*.backup
+*.auth-backup
+venuevista-frontend/dist/
