@@ -258,7 +258,7 @@ export default function Events({ onBack, user, initialFilters = {} }) {
         setApiError("");
 
         const response = await fetch(
-          "http://localhost:4000/api/events?limit=100"
+          "https://venuevista-o580.onrender.com/api/events?limit=100"
         );
 
         if (!response.ok) {

@@ -628,7 +628,7 @@ function CustomerDashboard({ user, onBrowseEvents, onMyTickets, onLogout }) {
       }
 
       try {
-        const response = await fetch("http://localhost:4000/api/bookings/mine", {
+        const response = await fetch("https://venuevista-o580.onrender.com/api/bookings/mine", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const payload = await response.json().catch(() => ({}));
@@ -827,8 +827,8 @@ function AnalyticsDashboard({ user, onBack, onLogout }) {
       const eventEndpoint = "/api/events/manage";
       const analyticsEndpoint = "/api/bookings/analytics";
       const [eventResponse, analyticsResponse] = await Promise.all([
-        fetch(`http://localhost:4000${eventEndpoint}`, { headers: requestHeaders() }),
-        fetch(`http://localhost:4000${analyticsEndpoint}?period=${period}`, { headers: requestHeaders() }),
+        fetch(`https://venuevista-o580.onrender.com${eventEndpoint}`, { headers: requestHeaders() }),
+        fetch(`https://venuevista-o580.onrender.com${analyticsEndpoint}?period=${period}`, { headers: requestHeaders() }),
       ]);
 
       if (eventResponse.ok) {
@@ -944,7 +944,7 @@ function AnalyticsDashboard({ user, onBack, onLogout }) {
     setSaving(true);
     setFormNotice("");
     try {
-      const response = await fetch("http://localhost:4000/api/events", {
+      const response = await fetch("https://venuevista-o580.onrender.com/api/events", {
         method: "POST",
         headers: requestHeaders(),
         body: JSON.stringify({

@@ -71,7 +71,7 @@ export default function Register({
 
     try {
       const response = await fetch(
-        "http://localhost:4000/api/auth/register",
+        "https://venuevista-o580.onrender.com/api/auth/register",
         {
           method: "POST",
           headers: {
@@ -134,7 +134,7 @@ export default function Register({
     } catch (error) {
       console.error("VenueVista registration failed:", error);
       setError(
-        "Unable to connect to the API. Confirm the backend is running at http://localhost:4000 and check the browser Console for details."
+        "Unable to connect to the API. Confirm the backend is running at https://venuevista-o580.onrender.com and check the browser Console for details."
       );
     }
   };
