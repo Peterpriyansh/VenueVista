@@ -252,13 +252,39 @@ export default function Events({ onBack, user, initialFilters = {} }) {
   const [apiError, setApiError] = useState("");
 
   useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        setLoading(true);
-        setApiError("");
+    let cancelled = false;
+    const cacheKey = "venuevista_events_cache_v1";
+    const cacheDuration = 5 * 60 * 1000; // 5 minutes
 
+    const loadEvents = async () => {
+      // Show previously loaded events immediately while fresh data loads.
+      try {
+        const cachedText = sessionStorage.getItem(cacheKey);
+        if (cachedText) {
+          const cached = JSON.parse(cachedText);
+          if (
+            Array.isArray(cached.events) &&
+            Date.now() - cached.savedAt < cacheDuration
+          ) {
+            setEventsData(cached.events);
+            setLoading(false);
+          }
+        }
+      } catch {
+        // Ignore invalid/unavailable cache and continue with the API request.
+      }
+
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 30000);
+
+      try {
+        setApiError("");
         const response = await fetch(
-          "https://venuevista-o580.onrender.com/api/events?limit=100"
+          "https://venuevista-o580.onrender.com/api/events?limit=100",
+          {
+            signal: controller.signal,
+            headers: { Accept: "application/json" },
+          }
         );
 
         if (!response.ok) {
@@ -266,8 +292,7 @@ export default function Events({ onBack, user, initialFilters = {} }) {
         }
 
         const result = await response.json();
-
-        // Support both a plain array and common paginated API response shapes.
+        // Support a plain array and common paginated API response shapes.
         const apiEvents = Array.isArray(result)
           ? result
           : Array.isArray(result.data)
@@ -280,18 +305,38 @@ export default function Events({ onBack, user, initialFilters = {} }) {
                   ? result.events
                   : [];
 
-        setEventsData(apiEvents.map(formatApiEvent));
+        const formattedEvents = apiEvents.map(formatApiEvent);
+
+        if (!cancelled) {
+          setEventsData(formattedEvents);
+          try {
+            sessionStorage.setItem(
+              cacheKey,
+              JSON.stringify({ events: formattedEvents, savedAt: Date.now() })
+            );
+          } catch {
+            // Storage may be full or disabled; events still work without cache.
+          }
+        }
       } catch (error) {
-        setApiError(
-          error.message ||
-            "Backend se connection nahi ho paaya. Backend server check karo."
-        );
+        if (!cancelled) {
+          setApiError(
+            error.name === "AbortError"
+              ? "Events load hone mein zyada time lag raha hai. Please dobara try karo."
+              : error.message ||
+                  "Backend se connection nahi ho paaya. Backend server check karo."
+          );
+        }
       } finally {
-        setLoading(false);
+        window.clearTimeout(timeoutId);
+        if (!cancelled) setLoading(false);
       }
     };
 
     loadEvents();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredEvents = useMemo(() => {
