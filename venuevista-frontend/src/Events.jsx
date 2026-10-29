@@ -115,10 +115,10 @@ const categories = [
 
 const priceFilters = [
   "All Prices",
-  "Under â‚¹500",
-  "â‚¹500 â€“ â‚¹1,000",
-  "â‚¹1,000 â€“ â‚¹2,500",
-  "â‚¹2,500+",
+  "Under ₹500",
+  "₹500 – ₹1,000",
+  "₹1,000 – ₹2,500",
+  "₹2,500+",
 ];
 
 function EventCard({ event, onOpen }) {
@@ -198,7 +198,7 @@ function EventCard({ event, onOpen }) {
             <small>Starting from</small>
 
             <strong>
-              â‚¹{event.price.toLocaleString()}
+              {"₹"}{Number(event.price).toLocaleString("en-IN")}
             </strong>
           </div>
 
@@ -266,13 +266,19 @@ export default function Events({ onBack, user, initialFilters = {} }) {
         }
 
         const result = await response.json();
-        const apiEvents = Array.isArray(result.data)
-          ? result.data
-          : Array.isArray(result.data?.events)
-            ? result.data.events
-            : Array.isArray(result.events)
-              ? result.events
-              : [];
+
+        // Support both a plain array and common paginated API response shapes.
+        const apiEvents = Array.isArray(result)
+          ? result
+          : Array.isArray(result.data)
+            ? result.data
+            : Array.isArray(result.data?.events)
+              ? result.data.events
+              : Array.isArray(result.data?.items)
+                ? result.data.items
+                : Array.isArray(result.events)
+                  ? result.events
+                  : [];
 
         setEventsData(apiEvents.map(formatApiEvent));
       } catch (error) {
@@ -352,13 +358,13 @@ export default function Events({ onBack, user, initialFilters = {} }) {
     }
 
     // PRICE
-    if (priceFilter === "Under â‚¹500") {
+    if (priceFilter === "Under ₹500") {
       result = result.filter(
         (event) => event.price < 500
       );
     }
 
-    if (priceFilter === "â‚¹500 â€“ â‚¹1,000") {
+    if (priceFilter === "₹500 – ₹1,000") {
       result = result.filter(
         (event) =>
           event.price >= 500 &&
@@ -366,7 +372,7 @@ export default function Events({ onBack, user, initialFilters = {} }) {
       );
     }
 
-    if (priceFilter === "â‚¹1,000 â€“ â‚¹2,500") {
+    if (priceFilter === "₹1,000 – ₹2,500") {
       result = result.filter(
         (event) =>
           event.price >= 1000 &&
@@ -374,7 +380,7 @@ export default function Events({ onBack, user, initialFilters = {} }) {
       );
     }
 
-    if (priceFilter === "â‚¹2,500+") {
+    if (priceFilter === "₹2,500+") {
       result = result.filter(
         (event) => event.price > 2500
       );
@@ -410,7 +416,8 @@ export default function Events({ onBack, user, initialFilters = {} }) {
     }
 
     return result;
-  }, [
+   }, [
+    eventsData,
     activeCategory,
     city,
     country,
@@ -486,7 +493,7 @@ export default function Events({ onBack, user, initialFilters = {} }) {
             className="events-back-button"
             onClick={onBack}
           >
-            â† Back to Home
+            ← Back to Home
           </button>
 
         </div>
@@ -611,7 +618,7 @@ export default function Events({ onBack, user, initialFilters = {} }) {
                       {activeCategory ===
                         category && (
                         <span>
-                          âœ“
+                          ✓
                         </span>
                       )}
                     </button>
@@ -639,7 +646,7 @@ export default function Events({ onBack, user, initialFilters = {} }) {
                 onChange={(e) => setCity(e.target.value)}
               />
               <datalist id="venuevista-events-city-suggestions">
-                {["Delhi","Mumbai","Bengaluru","Pune","Hyderabad","Chennai","Kolkata","Jaipur","Ahmedabad","Lucknow","New York","Los Angeles","London","Paris","Tokyo","Dubai","Singapore","Toronto","Sydney","Melbourne","Berlin","Rome","Barcelona","Amsterdam","Bangkok","Seoul","Hong Kong","Cape Town","SÃ£o Paulo","Auckland"].map((name) => <option key={name} value={name} />)}
+                {["Delhi","Mumbai","Bengaluru","Pune","Hyderabad","Chennai","Kolkata","Jaipur","Ahmedabad","Lucknow","New York","Los Angeles","London","Paris","Tokyo","Dubai","Singapore","Toronto","Sydney","Melbourne","Berlin","Rome","Barcelona","Amsterdam","Bangkok","Seoul","Hong Kong","Cape Town","São Paulo","Auckland"].map((name) => <option key={name} value={name} />)}
               </datalist>
 
             </div>
@@ -678,7 +685,7 @@ export default function Events({ onBack, user, initialFilters = {} }) {
                   onChange={(e) => setSelectedDate(e.target.value)}
                 />
                 {selectedDate ? (
-                  <button type="button" className="clear-date" onClick={() => setSelectedDate("")} aria-label="Clear date">Ã—</button>
+                  <button type="button" className="clear-date" onClick={() => setSelectedDate("")} aria-label="Clear date">×</button>
                 ) : <ChevronDown size={13} />}
               </label>
 

@@ -39,8 +39,8 @@ Foundation for the commercial VenueVista backend using Node.js, Express, Postgre
    npm run dev
    ```
 7. Check:
-   - `http://localhost:4000/`
-   - `http://localhost:4000/api/health`
+   - `https://venuevista-o580.onrender.com/`
+   - `https://venuevista-o580.onrender.com/api/health`
 
 The health endpoint checks both the API and database connection.
 

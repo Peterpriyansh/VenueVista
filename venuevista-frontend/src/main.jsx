@@ -524,6 +524,7 @@ function EventCard({
   event,
   wishlist,
   setWishlist,
+  onOpen,
 }) {
   const active = wishlist.includes(
     event.title
@@ -546,7 +547,20 @@ function EventCard({
   };
 
   return (
-    <article className="event-card">
+    <article
+      className="event-card"
+      role="button"
+      tabIndex={0}
+      aria-label={`Explore ${event.title}`}
+      onClick={() => onOpen?.(event)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen?.(event);
+        }
+      }}
+      style={{ cursor: "pointer" }}
+    >
       <div className="event-image">
         <img
           src={event.image}
@@ -564,7 +578,10 @@ function EventCard({
           className={`heart ${
             active ? "active" : ""
           }`}
-          onClick={toggleWishlist}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleWishlist();
+          }}
           aria-label={
             active
               ? "Remove from wishlist"
@@ -598,6 +615,28 @@ function EventCard({
           <span>From</span>
           <strong>{event.price}</strong>
         </div>
+
+        <button
+          type="button"
+          className="event-card-details-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpen?.(event);
+          }}
+          style={{
+            marginTop: 14,
+            width: "100%",
+            padding: "10px 12px",
+            border: "1px solid rgba(212, 160, 66, .55)",
+            borderRadius: 9,
+            background: "rgba(212, 160, 66, .10)",
+            color: "inherit",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Explore Event <ArrowRight size={14} style={{ verticalAlign: "middle", marginLeft: 6 }} />
+        </button>
       </div>
     </article>
   );
@@ -2073,6 +2112,9 @@ function App() {
                   wishlist={wishlist}
                   setWishlist={
                     setWishlist
+                  }
+                  onOpen={(selectedEvent) =>
+                    openEventsWithQuery(selectedEvent.title)
                   }
                 />
               )
